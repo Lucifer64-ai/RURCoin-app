@@ -1,0 +1,2 @@
+# RURCoin-app
+RURapp
