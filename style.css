@@ -1,0 +1,351 @@
+// style.js - Утилиты для работы со стилями в проекте RURCoin
+class StyleManager {
+    constructor() {
+        this.init();
+    }
+
+    init() {
+        console.log('StyleManager инициализирован');
+    }
+
+    // ========== ОСНОВНЫЕ ФУНКЦИИ ДЛЯ РАБОТЫ СО СТИЛЯМИ ==========
+
+    // Установка одного стиля для элемента [citation:1][citation:2]
+    setStyle(element, property, value) {
+        if (!element || !property) return false;
+        
+        try {
+            // Конвертация kebab-case в camelCase [citation:9]
+            const camelCaseProperty = this.toCamelCase(property);
+            element.style[camelCaseProperty] = value;
+            return true;
+        } catch (error) {
+            console.error('Ошибка установки стиля:', error);
+            return false;
+        }
+    }
+
+    // Установка нескольких стилей одновременно [citation:1][citation:10]
+    setMultipleStyles(element, styles) {
+        if (!element || !styles) return false;
+
+        try {
+            // Сохраняем существующие стили и добавляем новые
+            let cssText = element.style.cssText || '';
+            
+            Object.keys(styles).forEach(property => {
+                const camelCaseProperty = this.toCamelCase(property);
+                const value = styles[property];
+                cssText += ${property}: ${value}; ;
+            });
+            
+            element.style.cssText = cssText;
+            return true;
+        } catch (error) {
+            console.error('Ошибка установки стилей:', error);
+            return false;
+        }
+    }
+
+    // Получение значения стиля [citation:1][citation:3][citation:10]
+    getStyle(element, property) {
+        if (!element || !property) return null;
+
+        try {
+            // Пытаемся получить inline стиль сначала
+            const camelCaseProperty = this.toCamelCase(property);
+            const inlineValue = element.style[camelCaseProperty];
+            
+            if (inlineValue) return inlineValue;
+            
+            // Если inline стиля нет, получаем вычисленный стиль [citation:3]
+            const computedStyle = getComputedStyle(element);
+            return computedStyle.getPropertyValue(property);
+        } catch (error) {
+            console.error('Ошибка получения стиля:', error);
+            return null;
+        }
+    }
+
+    // ========== РАБОТА С CSS КЛАССАМИ ==========
+
+    // Добавление класса
+    addClass(element, className) {
+        if (!element || !className) return false;
+        element.classList.add(className);
+        return true;
+    }
+
+    // Удаление класса
+    removeClass(element, className) {
+        if (!element || !className) return false;
+        element.classList.remove(className);
+        return true;
+    }
+
+    // Переключение класса
+    toggleClass(element, className) {
+        if (!element || !className) return false;
+        element.classList.toggle(className);
+        return true;
+    }
+
+    // Проверка наличия класса
+    hasClass(element, className) {
+        if (!element || !className) return false;
+        return element.classList.contains(className);
+    }
+
+    // ========== АНИМАЦИИ И ПЕРЕХОДЫ ==========
+
+    // Плавное появление элемента
+    fadeIn(element, duration = 300) {
+        if (!element) return Promise.reject('Элемент не найден');
+
+        return new Promise((resolve) => {
+            this.setStyle(element, 'opacity', '0');
+            this.setStyle(element, 'display', 'block');
+            
+            let startTime = null;
+            
+            function animate(currentTime) {
+                if (!startTime) startTime = currentTime;
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                
+                element.style.opacity = progress.toString();
+                
+                if (progress < 1) {
+                    requestAnimationFrame(animate);
+                } else {
+                    resolve();
+                }
+            }
+            
+            requestAnimationFrame(animate);
+        });
+    }
+
+Мой Волна, [03.10.2025 11:17]
+// Плавное исчезновение элемента
+    fadeOut(element, duration = 300) {
+        if (!element) return Promise.reject('Элемент не найден');
+
+        return new Promise((resolve) => {
+            let startTime = null;
+            
+            function animate(currentTime) {
+                if (!startTime) startTime = currentTime;
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                
+                element.style.opacity = (1 - progress).toString();
+                
+                if (progress < 1) {
+                    requestAnimationFrame(animate);
+                } else {
+                    element.style.display = 'none';
+                    resolve();
+                }
+            }
+            
+            requestAnimationFrame(animate);
+        });
+    }
+
+    // Анимация скольжения (открытие)
+    slideDown(element, duration = 300) {
+        if (!element) return Promise.reject('Элемент не найден');
+
+        return new Promise((resolve) => {
+            this.setStyle(element, 'height', '0px');
+            this.setStyle(element, 'overflow', 'hidden');
+            this.setStyle(element, 'display', 'block');
+            
+            const fullHeight = element.scrollHeight + 'px';
+            
+            let startTime = null;
+            
+            function animate(currentTime) {
+                if (!startTime) startTime = currentTime;
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                
+                element.style.height = (parseInt(fullHeight) * progress) + 'px';
+                
+                if (progress < 1) {
+                    requestAnimationFrame(animate);
+                } else {
+                    element.style.height = 'auto';
+                    resolve();
+                }
+            }
+            
+            requestAnimationFrame(animate);
+        });
+    }
+
+    // Анимация скольжения (закрытие)
+    slideUp(element, duration = 300) {
+        if (!element) return Promise.reject('Элемент не найден');
+
+        return new Promise((resolve) => {
+            const startHeight = element.scrollHeight + 'px';
+            this.setStyle(element, 'height', startHeight);
+            this.setStyle(element, 'overflow', 'hidden');
+            
+            let startTime = null;
+            
+            function animate(currentTime) {
+                if (!startTime) startTime = currentTime;
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                
+                element.style.height = (parseInt(startHeight) * (1 - progress)) + 'px';
+                
+                if (progress < 1) {
+                    requestAnimationFrame(animate);
+                } else {
+                    element.style.display = 'none';
+                    element.style.height = '';
+                    element.style.overflow = '';
+                    resolve();
+                }
+            }
+            
+            requestAnimationFrame(animate);
+        });
+    }
+
+    // ========== СПЕЦИАЛЬНЫЕ СТИЛИ ДЛЯ RURCOIN ==========
+
+    // Подсветка элемента (для транзакций и уведомлений)
+    highlightElement(element, color = '#ffd700', duration = 2000) {
+        if (!element) return;
+
+        const originalBackground = this.getStyle(element, 'background-color');
+        const originalTransition = this.getStyle(element, 'transition');
+        
+        this.setStyle(element, 'transition', 'background-color 0.5s ease');
+        this.setStyle(element, 'background-color', color);
+        
+        setTimeout(() => {
+            this.setStyle(element, 'background-color', originalBackground);
+            
+            setTimeout(() => {
+                this.setStyle(element, 'transition', originalTransition);
+            }, 500);
+        }, duration);
+    }
+
+Мой Волна, [03.10.2025 11:17]
+// Пульсирующая анимация для привлечения внимания
+    pulseElement(element, duration = 1000, iterations = 3) {
+        if (!element) return;
+
+        const keyframes = [
+            { transform: 'scale(1)' },
+            { transform: 'scale(1.05)' },
+            { transform: 'scale(1)' }
+        ];
+
+        const options = {
+            duration: duration,
+            iterations: iterations
+        };
+
+        element.animate(keyframes, options);
+    }
+
+    // Стили для модальных окон [citation:1]
+    showModal(modalElement) {
+        if (!modalElement) return;
+        
+        this.setStyle(modalElement, 'display', 'flex');
+        this.setStyle(modalElement, 'opacity', '0');
+        
+        setTimeout(() => {
+            this.setStyle(modalElement, 'opacity', '1');
+        }, 10);
+        
+        // Блокировка прокрутки body
+        document.body.style.overflow = 'hidden';
+    }
+
+    hideModal(modalElement) {
+        if (!modalElement) return;
+        
+        this.setStyle(modalElement, 'opacity', '0');
+        
+        setTimeout(() => {
+            this.setStyle(modalElement, 'display', 'none');
+            document.body.style.overflow = '';
+        }, 300);
+    }
+
+    // ========== УТИЛИТЫ ==========
+
+    // Конвертация kebab-case в camelCase [citation:9]
+    toCamelCase(kebabCase) {
+        return kebabCase.replace(/-([a-z])/g, (match, group) => group.toUpperCase());
+    }
+
+    // Конвертация camelCase в kebab-case
+    toKebabCase(camelCase) {
+        return camelCase.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
+    }
+
+    // Проверка поддержки CSS свойства
+    isPropertySupported(property) {
+        if (!property) return false;
+        
+        const style = document.documentElement.style;
+        const camelCaseProperty = this.toCamelCase(property);
+        return camelCaseProperty in style;
+    }
+
+    // Сброс стилей элемента
+    resetStyles(element) {
+        if (!element) return;
+        element.style.cssText = '';
+    }
+
+    // Копирование стилей из одного элемента в другой
+    copyStyles(sourceElement, targetElement) {
+        if (!sourceElement || !targetElement) return;
+        
+        const computedStyle = getComputedStyle(sourceElement);
+        for (let i = 0; i < computedStyle.length; i++) {
+            const property = computedStyle[i];
+            const value = computedStyle.getPropertyValue(property);
+            targetElement.style.setProperty(property, value);
+        }
+    }
+}
+
+// ========== ГОТОВЫЕ КОМПОНЕНТЫ СТИЛЕЙ ДЛЯ RURCOIN ==========
+
+// Стили для кнопок в русском стиле
+const RussianButtonStyles = {
+    primary: {
+        background: 'linear-gradient(135deg, #d52b1e 0%, #0039a6 100%)',
+        color: 'white',
+        border: '2px solid #ffd700',
+        borderRadius: '25px',
+        padding: '12px 24px',
+        fontWeight: 'bold',
+        textShadow: '1px 1px 2px rgba(0, 0, 0, 0.5)',
+        boxShadow: '0 4px 15px rgba(0, 0, 0, 0.3)',
+        cursor: 'pointer',
+        transition: 'all 0.3s ease'
+    },
+    large: {
+        padding: '15px 30px',
+        fontSize: '1.1em'
+    },
+    small: {
+        padding: '8px 16px',
+        fontSize: '0.9em'
+    },
+    disabled: {
+        opacity

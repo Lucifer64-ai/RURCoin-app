@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RURCoin - Русская криптовалюта</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <!-- TON Connect SDK -->
+    <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Хедер -->
+        <header class="patriotic-header">
+            <div class="header-content">
+                <div class="logo-container">
+                    <div class="logo-placeholder">????</div>
+                    <div class="logo-text">
+                        <h1>RURCoin</h1>
+                        <p>Национальная криптовалюта России</p>
+                    </div>
+                </div>
+                <!-- Контейнер для кнопки подключения кошелька TON Connect -->
+                <div id="tonconnect-button"></div>
+                <div class="wallet-info" id="walletInfo" style="display: none;">
+                    <div class="balance">Баланс: <span id="walletBalance">0</span> TON</div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Навигация с вкладками -->
+        <nav class="tabs-navigation">
+            <div class="tabs-container">
+                <button class="tab-btn" data-tab="info">
+                    <span class="tab-icon">??</span>
+                    <span class="tab-text">Инфо RURC</span>
+                </button>
+                <button class="tab-btn" data-tab="mining">
+                    <span class="tab-icon">??</span>
+                    <span class="tab-text">Майнинг</span>
+                </button>
+                <button class="tab-btn" data-tab="farm">
+                    <span class="tab-icon">???</span>
+                    <span class="tab-text">Нефтяные вышки</span>
+                </button>
+                <button class="tab-btn" data-tab="upgrades">
+                    <span class="tab-icon">??</span>
+                    <span class="tab-text">Улучшения</span>
+                </button>
+                <button class="tab-btn" data-tab="vip">
+                    <span class="tab-icon">??</span>
+                    <span class="tab-text">VIP</span>
+                </button>
+            </div>
+        </nav>
+
+        <!-- Основной контент -->
+        <main class="main-content">
+            <!-- Вкладка информации -->
+            <section id="infoTab" class="tab-content active">
+                <div class="info-interface">
+                    <div class="token-stats russian-card">
+                        <h3>?? Статистика RURCoin</h3>
+                        <div class="stats-grid">
+                            <div class="stat-item">
+                                <span class="stat-label">Цена RURC:</span>
+                                <span class="stat-value" id="rurcPriceLive">$0.02064</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Рыночная капитализация:</span>
+                                <span class="stat-value" id="marketCap">$20.64M</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Ликвидность:</span>
+                                <span class="stat-value" id="liquidity">$255.71</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Держатели:</span>
+                                <span class="stat-value" id="holders">30</span>
+                            </div>
+                            <div class="stat-item">
+
+Мой Волна, [03.10.2025 10:56]
+<span class="stat-label">Объем (24ч):</span>
+                                <span class="stat-value" id="volume24h">$0</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Изменение (24ч):</span>
+                                <span class="stat-value" id="priceChange24h">0%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="price-chart russian-card">
+                        <h3>?? График цены RUR/TON</h3>
+                        <div class="chart-container">
+                            <canvas id="priceChart"></canvas>
+                        </div>
+                        <div class="chart-controls">
+                            <button class="time-btn active" data-interval="1h">1Ч</button>
+                            <button class="time-btn" data-interval="24h">24Ч</button>
+                            <button class="time-btn" data-interval="7d">7Д</button>
+                            <button class="time-btn" data-interval="30d">30Д</button>
+                        </div>
+                    </div>
+
+                    <div class="contract-info russian-card">
+                        <h3>?? Контракт RURCoin</h3>
+                        <div class="contract-address">
+                            <span>Адрес контракта:</span>
+                            <code id="contractAddress">EQA9z4hQ9eWv-1eSgm3NJu1meb5QLJAoTjROMlBZBM15a7Z_</code>
+                            <button class="copy-btn" onclick="app.copyToClipboard('contractAddress')">??</button>
+                        </div>
+                        <div class="pool-info">
+                            <span>Пул ликвидности:</span>
+                            <span>STON.fi</span>
+                        </div>
+                        <button class="russian-button" onclick="app.openInExplorer()">
+                            ?? Открыть в GeckoTerminal
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Вкладка майнинга -->
+            <section id="miningTab" class="tab-content">
+                <div class="mining-interface">
+                    <div class="wallet-connection russian-card">
+                        <h3>?? Подключение TON кошелька</h3>
+                        <!-- Контейнер для TON Connect будет здесь -->
+                        <div id="wallet-connection-container">
+                            <p>Используйте кнопку в хедере для подключения кошелька</p>
+                        </div>
+                        <div class="connected-info" id="connectedInfo" style="display: none;">
+                            <div class="wallet-address">
+                                <strong>Адрес:</strong> 
+                                <span id="walletAddress">-</span>
+                            </div>
+                            <div class="wallet-balance">
+                                <strong>Баланс:</strong> 
+                                <span id="connectedBalance">0</span> TON
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="token-info russian-card">
+                        <h3>?? Токен RURCoin</h3>
+                        <div class="token-stats">
+                            <div class="token-stat">
+                                <span>Ваш баланс RURC:</span>
+                                <span id="userRURCBalance">0</span>
+                            </div>
+                            <div class="token-stat">
+                                <span>Цена RURC:</span>
+                                <span id="rurcPrice">0.01 TON</span>
+
+Мой Волна, [03.10.2025 10:56]
+</div>
+                            <div class="token-stat">
+                                <span>Общий пул нефти:</span>
+                                <span id="totalOilPool">10,000,000 литров</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Вкладка нефтяных вышек -->
+            <section id="farmTab" class="tab-content">
+                <div class="farm-interface">
+                    <!-- Модалка пользовательского соглашения -->
+                    <div id="termsModal" class="modal">
+                        <div class="modal-content terms-modal">
+                            <div class="modal-header">
+                                <h3>?? Пользовательское соглашение</h3>
+                            </div>
+                            <div class="modal-body">
+                                <div class="terms-content">
+                                    <h4>Перед началом фарминга ознакомьтесь с условиями:</h4>
+                                    <div class="terms-scroll">
+                                        <p><strong>1. Общие положения</strong></p>
+                                        <p>1.1. RURCoin - это децентрализованный проект на блокчейне TON.</p>
+                                        <p>1.2. Участие в фарминге добровольное и осуществляется на свой риск.</p>
+                                        
+                                        <p><strong>2. Условия участия</strong></p>
+                                        <p>2.1. Для начала фарминга требуется оплата начального взноса 2 TON.</p>
+                                        <p>2.2. Средства переводятся на смарт-контракт и не подлежат возврату.</p>
+                                        
+                                        <p><strong>3. Риски</strong></p>
+                                        <p>3.1. Криптовалютные инвестиции сопряжены с высокими рисками.</p>
+                                        <p>3.2. Цена RURCoin может колебаться в широких пределах.</p>
+                                        <p>3.3. Проект не гарантирует доходности.</p>
+                                        
+                                        <p><strong>4. Ответственность</strong></p>
+                                        <p>4.1. Участник несет полную ответственность за свои инвестиционные решения.</p>
+                                        <p>4.2. Администрация не несет ответственности за убытки.</p>
+
+                                        <p><strong>5. Платежи и комиссии</strong></p>
+                                        <p>5.1. Все транзакции в сети TON облагаются комиссиями сети.</p>
+                                        <p>5.2. Комиссии за обмен нефти на RURCoin составляют 5%.</p>
+
+                                        <p><strong>6. Прекращение действия</strong></p>
+                                        <p>6.1. Мы оставляем за собой право прекратить доступ к фармингу при нарушении условий.</p>
+                                        <p>6.2. При прекращении действия остатки нефти и RURCoin сохраняются на кошельке пользователя.</p>
+                                    </div>
+                                    <div class="terms-checkbox">
+                                        <input type="checkbox" id="agreeTerms">
+                                        <label for="agreeTerms">Я прочитал и согласен с условиями пользовательского соглашения</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button class="russian-button" onclick="app.acceptTerms()" id="acceptTermsBtn" disabled>
+
+Мой Волна, [03.10.2025 10:56]
+Принять и продолжить
+                                </button>
+                                <button class="russian-button secondary" onclick="app.declineTerms()">
+                                    Отклонить
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Начало фарминга -->
+                    <div class="start-farming russian-card" id="startFarmingSection">
+                        <h3>?? Начать нефтяной фарминг</h3>
+                        <p>Для начала добычи нефти необходимо оплатить начальный взнос</p>
+                        <div class="start-cost">
+                            <span>Стоимость: <strong>2 TON</strong></span>
+                            <small>TON отправляется на: UQAfEl3NlWxvs9pNcuszZeBa5sSGfgrfCFsmp9kc-_ZGy-xF</small>
+                        </div>
+                        <button class="russian-button large" onclick="app.showTermsModal()" id="startFarmingBtn">
+                            <span class="btn-icon">?</span>
+                            Начать фарминг за 2 TON
+                        </button>
+                    </div>
+
+                    <!-- Основной интерфейс фарминга -->
+                    <div class="farming-main" id="farmingMain" style="display: none;">
+                        <!-- Бочки с нефтью -->
+                        <div class="oil-barrels russian-card">
+                            <h3>??? Ваши нефтяные бочки</h3>
+                            <div class="barrels-container" id="barrelsContainer">
+                                <div class="no-barrels-message">
+                                    Купите первую вышку чтобы начать добычу!
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Покупка вышек -->
+                        <div class="rigs-store russian-card">
+                            <h3>??? Покупка нефтяных вышек</h3>
+                            <div class="rigs-grid">
+                                <div class="rig-item">
+                                    <div class="rig-icon">???</div>
+                                    <div class="rig-info">
+                                        <h4>Старая качалка</h4>
+                                        <p>Добыча: 50 литров/час</p>
+                                        <p>Емкость: 1,000 литров</p>
+                                        <p>Слоты: 2</p>
+                                        <p class="cost">0.5 TON</p>
+                                    </div>
+                                    <button class="russian-button small" onclick="app.buyOilRig(1)">
+                                        Купить
+                                    </button>
+                                </div>
+                                
+                                <div class="rig-item">
+                                    <div class="rig-icon">??</div>
+                                    <div class="rig-info">
+                                        <h4>Буровая установка</h4>
+                                        <p>Добыча: 120 литров/час</p>
+                                        <p>Емкость: 2,500 литров</p>
+                                        <p>Слоты: 4</p>
+                                        <p class="cost">1.5 TON</p>
+                                    </div>
+                                    <button class="russian-button small" onclick="app.buyOilRig(2)">
+                                        Купить
+                                    </button>
+                                </div>
+                                
+                                <div class="rig-item">
+                                    <div class="rig-icon">??</div>
+
+Мой Волна, [03.10.2025 10:56]
+<div class="rig-info">
+                                        <h4>Морская платформа</h4>
+                                        <p>Добыча: 300 литров/час</p>
+                                        <p>Емкость: 6,000 литров</p>
+                                        <p>Слоты: 6</p>
+                                        <p class="cost">4 TON</p>
+                                    </div>
+                                    <button class="russian-button small" onclick="app.buyOilRig(3)">
+                                        Купить
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Обмен нефти -->
+                        <div class="oil-exchange russian-card">
+                            <h3>?? Обмен нефти на RURC</h3>
+                            <div class="exchange-info">
+                                <div class="exchange-rate">
+                                    <span>Курс: 1 литр = </span>
+                                    <span id="exchangeRate">0.01 RURC</span>
+                                </div>
+                                <div class="available-oil">
+                                    <span>Доступно нефти: </span>
+                                    <span id="availableOil">0 литров</span>
+                                </div>
+                            </div>
+                            <div class="exchange-controls">
+                                <button class="russian-button" onclick="app.exchangeAllOil()">
+                                    Обменять всю нефть
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Вкладка улучшений -->
+            <section id="upgradesTab" class="tab-content">
+                <div class="upgrades-interface">
+                    <!-- Улучшения шестерёнок -->
+                    <div class="gears-upgrades russian-card">
+                        <h3>?? Улучшения шестерёнок</h3>
+                        <div class="upgrades-grid">
+                            <div class="upgrade-item">
+                                <div class="upgrade-icon">??</div>
+                                <div class="upgrade-info">
+                                    <h4>Обычная шестерёнка</h4>
+                                    <p>+5% к добыче нефти</p>
+                                    <p class="upgrade-cost">0.3 TON</p>
+                                </div>
+                                <button class="russian-button small" onclick="app.buyGear('common')">
+                                    Купить
+                                </button>
+                            </div>
+                            
+                            <div class="upgrade-item">
+                                <div class="upgrade-icon">???</div>
+                                <div class="upgrade-info">
+                                    <h4>Улучшенная шестерёнка</h4>
+                                    <p>+12% к добыче нефти</p>
+                                    <p class="upgrade-cost">0.8 TON</p>
+                                </div>
+                                <button class="russian-button small" onclick="app.buyGear('improved')">
+                                    Купить
+                                </button>
+                            </div>
+                            
+                            <div class="upgrade-item">
+                                <div class="upgrade-icon">??</div>
+                                <div class="upgrade-info">
+                                    <h4>Эпическая шестерёнка</h4>
+
+Мой Волна, [03.10.2025 10:56]
+<p>+25% к добыче нефти</p>
+                                    <p class="upgrade-cost">2 TON</p>
+                                </div>
+                                <button class="russian-button small" onclick="app.buyGear('epic')">
+                                    Купить
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Улучшения насосов -->
+                    <div class="pumps-upgrades russian-card">
+                        <h3>?? Улучшения насосов</h3>
+                        <div class="upgrades-grid">
+                            <div class="upgrade-item">
+                                <div class="upgrade-icon">??</div>
+                                <div class="upgrade-info">
